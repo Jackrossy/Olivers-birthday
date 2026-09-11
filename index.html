@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oliver's Odyssey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --emerald: #1c5236;
+            --ocean: #0077b6;
+            --sand: #f4dbb2;
+            --gold: #d4af37;
+            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-board {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        #scene-image {
+            font-size: 5em;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        #story-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            min-height: 100px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--gold);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            width: 80%;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        button:hover {
+            background: var(--gold);
+            color: #0f2027;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        #progress-bar {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        #progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            z-index: 1;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            background: #203a43;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+
+        .step.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 15px var(--gold);
+        }
+
+        .fade {
+            animation: fadeIn 0.8s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #confetti {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: none;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-board">
+        <h1 id="title">The Celtic Shores</h1>
+        <div id="scene-image">🌊</div>
+        <div id="story-text">Welcome to the adventure.</div>
+        <div class="options-container" id="options">
+            <!-- Buttons injected by JS -->
+        </div>
+
+        <div id="progress-bar">
+            <div class="step active" id="step-0"></div>
+            <div class="step" id="step-1"></div>
+            <div class="step" id="step-2"></div>
+            <div class="step" id="step-3"></div>
+            <div class="step" id="step-4"></div>
+        </div>
+    </div>
+
+    <!-- Simple confetti script for the birthday finale -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        const story = [
+            {
+                title: "The Golden Sands",
+                icon: "🏖️",
+                text: "You are standing on a pristine, sun-drenched beach. The waves are crashing gently against the shore. Half-buried in the sand, you spot an ancient, ornate bottle pulsing with a faint emerald light.",
+                options: [
+                    { text: "Open the bottle dramatically.", next: 1 },
+                    { text: "Sing a warm-up scale to it.", next: 1 }
+                ]
+            },
+            {
+                title: "The Irish Portal",
+                icon: "☘️",
+                text: "The bottle shatters! A swirl of mist envelops you. The salty ocean air turns crisp and cool. You open your eyes to find yourself on the rugged cliffs of Moher in Ireland. A mythical Selkie blocks your path to the water.",
+                options: [
+                    { text: "Belt out a show-stopping musical number.", next: 2 },
+                    { text: "Perform a dramatic Shakespearean monologue.", next: 3 }
+                ]
+            },
+            {
+                title: "The Selkie's Duet",
+                icon: "🎶",
+                text: "The Selkie is stunned by your vocal range. She joins in for a flawless harmony. Delighted by the performance, she points toward a glowing underwater cavern in the bay.",
+                options: [
+                    { text: "Dive in and start swimming.", next: 4 }
+                ]
+            },
+            {
+                title: "The Theatrical Triumph",
+                icon: "🎭",
+                text: "You drop to one knee and deliver a performance so moving that the Selkie sheds a single tear. Applauding, she parts the crashing waves, revealing a hidden pathway beneath the sea.",
+                options: [
+                    { text: "Take a deep breath and dive in.", next: 4 }
+                ]
+            },
+            {
+                title: "The Deep Swim",
+                icon: "🏊‍♂️",
+                text: "You are gliding through crystal-clear Celtic waters. You navigate through glowing kelp forests and dodge playful dolphins. Ahead, a grand underwater stage made of glittering sea-glass awaits.",
+                options: [
+                    { text: "Swim gracefully toward the center stage.", next: 5 }
+                ]
+            },
+            {
+                title: "The Grand Finale",
+                icon: "🎂",
+                text: "As you step onto the stage, the ocean lights up. Merfolk, faeries, and sea creatures erupt into roaring applause. A massive coral banner drops from above...<br><br><strong>HAPPY 19TH BIRTHDAY OLIVER!</strong>",
+                options: []
+            }
+        ];
+
+        let currentStep = 0;
+
+        function updateScene(index) {
+            const scene = story[index];
+            const board = document.getElementById('game-board');
+            
+            // Re-trigger animation
+            board.classList.remove('fade');
+            void board.offsetWidth; // trigger reflow
+            board.classList.add('fade');
+
+            document.getElementById('title').innerHTML = scene.title;
+            document.getElementById('scene-image').innerHTML = scene.icon;
+            document.getElementById('story-text').innerHTML = scene.text;
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            if (scene.options.length > 0) {
+                scene.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.innerText = opt.text;
+                    btn.onclick = () => updateScene(opt.next);
+                    optionsContainer.appendChild(btn);
+                });
+            }
+
+            // Update Progress Bar visually mapping the narrative steps
+            let visualStep = 0;
+            if(index === 0) visualStep = 0;
+            if(index === 1) visualStep = 1;
+            if(index === 2 || index === 3) visualStep = 2;
+            if(index === 4) visualStep = 3;
+            if(index === 5) {
+                visualStep = 4;
+                triggerConfetti();
+            }
+
+            document.querySelectorAll('.step').forEach((el, i) => {
+                if(i <= visualStep) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+        }
+
+        function triggerConfetti() {
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#1c5236', '#d4af37', '#0077b6']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#1c5236', '#d4af37', '#0077b6']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        // Initialize Game
+        updateScene(0);
+    </script>
+</body>
+</html>
